@@ -1,13 +1,17 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
+import os
 
-st = '111001581' 
-profile = webdriver.FirefoxProfile()
+st = '161000243'
+
+folderName = os.path.join(os.path.expanduser("~/"), "freight-register-automation")
+fileName = 'RR-'+st+'.pdf' 
+profile = webdriver.FirefoxProfile(folderName)
 profile.set_preference('print.always_print_silent', True)
+profile.set_preference("print_printer", "PDF")
 profile.set_preference('print.print_to_file', True)
-profile.set_preference('print.print_to_filename', st)
-
+profile.set_preference('print.print_to_filename', os.path.join(folderName, fileName))
 browser = webdriver.Firefox(profile)
 browser.get("https://www.fois.indianrail.gov.in/FoisWebsite/jsp/RMS_Zonal.jsp?txtProjName=TZ")
 browser.maximize_window()
@@ -53,4 +57,6 @@ frame3 = browser.find_element_by_xpath('//iframe[@name="frmDtls"]')
 browser.switch_to.frame(frame3)
 frame4 = browser.find_element_by_xpath('//iframe[@src="/foisweb/view/qry/TQ_OwcmViewRRSubOT.jsp"]')
 browser.switch_to.frame(frame4)
+yo = browser.find_element_by_xpath('//html/body/table/tbody/tr[6]/td[1]/table/tbody/tr[1]/td[2]/div/table/tbody/tr[1]/td[8]')
+print(yo.text)
 browser.find_element_by_link_text('print').click()
