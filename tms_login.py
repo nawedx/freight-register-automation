@@ -3,7 +3,7 @@ from selenium.webdriver.common.keys import Keys
 import time
 import os
 
-st = '161000243'
+st = '161003340'
 
 folderName = os.path.join(os.path.expanduser("~/"), "freight-register-automation")
 fileName = 'RR-'+st+'.pdf' 
@@ -47,6 +47,8 @@ browser.switch_to.frame(frame2)
 browser.find_element_by_id('Submit').click()
 
 time.sleep(8)
+browser.find_element_by_link_text('Show All').click()
+time.sleep(4)
 #frame3 = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
 #browser.switch_to.frame(frame3)
 link = browser.find_element_by_link_text(st)
