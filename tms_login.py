@@ -3,8 +3,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 import time
 import os
-
-st = ['111000474', '111001315', '111001609']
+import pandas as pd
+from pandas import ExcelWriter
+pd.set_option('display.max_columns', 100)
 
 '''
 folderName = os.path.join(os.path.expanduser("~/"), "freight-register-automation")
@@ -81,11 +82,41 @@ while not submitButton:
 submitButton.click()
 time.sleep(3)
 
-for i in st:
+showAll = None
+while not showAll:
+	try:
+		showAll = browser.find_element_by_link_text('Show All')
+	except NoSuchElementException:
+		time.sleep(1)
+showAll.click()
+
+browser.switch_to.default_content()
+frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
+browser.switch_to.frame(frm)
+
+excelDown = browser.find_element_by_link_text('Excel')
+excelDown.click()
+print('Please check whether MisOwtdFrgtRgtr.xls is downloaded and press any key : ')
+inp = raw_input()
+
+df = pd.read_table('/home/nawedx/Downloads/MisOwtdFrgtRgtr.xls', skiprows=2)
+df.columns = df.columns.str.replace(' ', '_')
+df['RR_NUMBER'] = df['RR_NUMBER'].fillna(0).astype(int)
+df['CMDT_CODE'] = df['CMDT_CODE'].fillna(0).astype(int)
+df['INVOICE_NO.'] = df['INVOICE_NO.'].fillna(0).astype(int)
+df = df[df.RR_NUMBER !=0 ]
+rrList = df['RR_NUMBER'].values
+listlen = len(rrList)
+
+df_RR_pol = pd.DataFrame(columns=['RR_Num', 'POL'])
+j = 0
+for i in rrList:
+	j = j + 1;
+	print("%.2f" % (j*100.0/listlen))
 	browser.switch_to.default_content()
 	frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
 	browser.switch_to.frame(frm)
-	'''
+
 	showAll = None
 	while not showAll:
 		try:
@@ -93,16 +124,18 @@ for i in st:
 		except NoSuchElementException:
 			time.sleep(1)
 	showAll.click()
-	'''
+	
+	browser.switch_to.default_content()
+	frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
+	browser.switch_to.frame(frm)
+	
 	link = None
 	while not link:
 		try:
-			link = browser.find_element_by_link_text(i)
+			link = browser.find_element_by_link_text(str(i))
 		except NoSuchElementException:
 			time.sleep(1)
-
 	link.click()
-	time.sleep(4)
 
 	frame3 = None
 	while not frame3:
@@ -121,8 +154,16 @@ for i in st:
 			time.sleep(1)
 
 	browser.switch_to.frame(frame4)
-	yo = browser.find_element_by_xpath('//html/body/table/tbody/tr[6]/td[1]/table/tbody/tr[1]/td[2]/div/table/tbody/tr[1]/td[8]')
-	print(yo.text)
+
+	yo = None
+	while not yo:
+		try:
+			yo = browser.find_element_by_xpath('//html/body/table/tbody/tr[6]/td[1]/table/tbody/tr[1]/td[2]/div/table/tbody/tr[1]/td[8]')
+		except NoSuchElementException:
+			time.sleep(1)
+
+	df_RR_pol = df_RR_pol.append({'RR_Num': i, 'POL':yo.text}, ignore_index=True)
+
 	#browser.find_element_by_link_text('print').click()
 
 	browser.switch_to.default_content()
@@ -133,3 +174,7 @@ for i in st:
 	back = browser.find_element_by_link_text('Back')
 	back.click()
 
+print(df_RR_pol)
+writer = ExcelWriter('RR-POL.xls')
+df_RR_POL.to_excel(writer,'Sheet1')
+writer.save()
