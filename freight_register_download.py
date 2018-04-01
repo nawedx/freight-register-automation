@@ -7,15 +7,16 @@ import pandas as pd
 from pandas import ExcelWriter
 pd.set_option('display.max_columns', 100)
 
-'''
+rrList = [10]
 folderName = os.path.join(os.path.expanduser("~/"), "freight-register-automation")
-fileName = 'RR-'+st
-profile = webdriver.FirefoxProfile()
+fileName = 'RR-'+str(rrList[0])+'.pdf'
+profile = webdriver.FirefoxProfile(folderName)
 profile.set_preference('print.always_print_silent', True)
 profile.set_preference("print_printer", "PDF")
 profile.set_preference('print.print_to_file', True)
-#profile.set_preference('print.print_to_filename', fileName)
-'''
+profile.set_preference('print.print_to_filename', fileName)
+
+import traffic_earning_download
 
 browser = webdriver.Firefox()
 browser.get("https://www.fois.indianrail.gov.in/FoisWebsite/jsp/RMS_Zonal.jsp?txtProjName=TZ")
@@ -105,76 +106,24 @@ df['RR_NUMBER'] = df['RR_NUMBER'].fillna(0).astype(int)
 df['CMDT_CODE'] = df['CMDT_CODE'].fillna(0).astype(int)
 df['INVOICE_NO.'] = df['INVOICE_NO.'].fillna(0).astype(int)
 df = df[df.RR_NUMBER !=0 ]
-rrList = df['RR_NUMBER'].values
-listlen = len(rrList)
+print('Outward Freight Register Loaded')
 
-df_RR_pol = pd.DataFrame(columns=['RR_Num', 'POL'])
-j = 0
-for i in rrList:
-	j = j + 1;
-	print("%.2f" % (j*100.0/listlen))
-	browser.switch_to.default_content()
-	frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
-	browser.switch_to.frame(frm)
 
-	showAll = None
-	while not showAll:
-		try:
-			showAll = browser.find_element_by_link_text('Show All')
-		except NoSuchElementException:
-			time.sleep(1)
-	showAll.click()
-	
-	browser.switch_to.default_content()
-	frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
-	browser.switch_to.frame(frm)
-	
-	link = None
-	while not link:
-		try:
-			link = browser.find_element_by_link_text(str(i))
-		except NoSuchElementException:
-			time.sleep(1)
-	link.click()
+df2 = pd.read_table('/home/nawedx/Downloads/TrfcErngLdng.xls', skiprows=2)
+df2.columns = df2.columns.str.replace(' ', '_')
+print('Traffic Earning Loaded')
 
-	frame3 = None
-	while not frame3:
-		try:
-			frame3 = browser.find_element_by_xpath('//iframe[@name="frmDtls"]')
-		except NoSuchElementException:
-			time.sleep(1)
+df3 = df.merge(df2, left_on=['RR_NUMBER', 'RR_DATE'], right_on=['RR_NUMB', 'RR_DATE'], how='left')
+print('MERGED')
+#print(df3.head())
 
-	browser.switch_to.frame(frame3)
+list1 = list(df3)
+list1 = list1[:5] + list1[-11:-6] + list1[-15:-13] + list1[6:-17]
+#print(list1)
+df3 = df3[list1]
 
-	frame4 = None
-	while not frame4:
-		try:
-			frame4 = browser.find_element_by_xpath('//iframe[@src="/foisweb/view/qry/TQ_OwcmViewRRSubOT.jsp"]')
-		except NoSuchElementException:
-			time.sleep(1)
-
-	browser.switch_to.frame(frame4)
-
-	yo = None
-	while not yo:
-		try:
-			yo = browser.find_element_by_xpath('//html/body/table/tbody/tr[6]/td[1]/table/tbody/tr[1]/td[2]/div/table/tbody/tr[1]/td[8]')
-		except NoSuchElementException:
-			time.sleep(1)
-
-	df_RR_pol = df_RR_pol.append({'RR_Num': i, 'POL':yo.text}, ignore_index=True)
-
-	#browser.find_element_by_link_text('print').click()
-
-	browser.switch_to.default_content()
-	frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
-	browser.switch_to.frame(frm)
-	frm = browser.find_element_by_xpath('//iframe[@name="frmDtls"]')
-	browser.switch_to.frame(frm)
-	back = browser.find_element_by_link_text('Back')
-	back.click()
-
-print(df_RR_pol)
-writer = ExcelWriter('RR-POL.xls')
-df_RR_POL.to_excel(writer,'Sheet1')
+writer = ExcelWriter('merged_freight_register.xls')
+df3.to_excel(writer,'Sheet1')
 writer.save()
+
+browser.quit()
