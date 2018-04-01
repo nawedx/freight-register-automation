@@ -42,11 +42,13 @@ while not radiobut:
 		radiobut = browser.find_element_by_id('txtOptnD')
 	except NoSuchElementException:
 		time.sleep(1)
+		
+import credentials
 location = browser.find_element_by_id('txtLocation')
-username.send_keys('KURACM')
-password.send_keys('pps')
+username.send_keys(credentials.uname)
+password.send_keys(credentials.pwd)
 radiobut.click()
-location.send_keys('KUR')
+location.send_keys(credentials.loc)
 login_attempt = browser.find_element_by_id('Submit')
 login_attempt.submit()
 time.sleep(3)
