@@ -3,18 +3,20 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 import time
 import os
+import pandas as pd
+from pandas import ExcelWriter
+pd.set_option('display.max_columns', 100)
 
-st = ['111000474', '111001315', '111001609']
-
-'''
+rrList = [10]
 folderName = os.path.join(os.path.expanduser("~/"), "freight-register-automation")
-fileName = 'RR-'+st
-profile = webdriver.FirefoxProfile()
+fileName = 'RR-'+str(rrList[0])+'.pdf'
+profile = webdriver.FirefoxProfile(folderName)
 profile.set_preference('print.always_print_silent', True)
 profile.set_preference("print_printer", "PDF")
 profile.set_preference('print.print_to_file', True)
-#profile.set_preference('print.print_to_filename', fileName)
-'''
+profile.set_preference('print.print_to_filename', fileName)
+
+import traffic_earning_download
 
 browser = webdriver.Firefox()
 browser.get("https://www.fois.indianrail.gov.in/FoisWebsite/jsp/RMS_Zonal.jsp?txtProjName=TZ")
@@ -81,55 +83,47 @@ while not submitButton:
 submitButton.click()
 time.sleep(3)
 
-for i in st:
-	browser.switch_to.default_content()
-	frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
-	browser.switch_to.frame(frm)
-	'''
-	showAll = None
-	while not showAll:
-		try:
-			showAll = browser.find_element_by_link_text('Show All')
-		except NoSuchElementException:
-			time.sleep(1)
-	showAll.click()
-	'''
-	link = None
-	while not link:
-		try:
-			link = browser.find_element_by_link_text(i)
-		except NoSuchElementException:
-			time.sleep(1)
+showAll = None
+while not showAll:
+	try:
+		showAll = browser.find_element_by_link_text('Show All')
+	except NoSuchElementException:
+		time.sleep(1)
+showAll.click()
 
-	link.click()
-	time.sleep(4)
+browser.switch_to.default_content()
+frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
+browser.switch_to.frame(frm)
 
-	frame3 = None
-	while not frame3:
-		try:
-			frame3 = browser.find_element_by_xpath('//iframe[@name="frmDtls"]')
-		except NoSuchElementException:
-			time.sleep(1)
+excelDown = browser.find_element_by_link_text('Excel')
+excelDown.click()
+print('Please check whether MisOwtdFrgtRgtr.xls is downloaded and press any key : ')
+inp = raw_input()
 
-	browser.switch_to.frame(frame3)
+df = pd.read_table('/home/nawedx/Downloads/MisOwtdFrgtRgtr.xls', skiprows=2)
+df.columns = df.columns.str.replace(' ', '_')
+df['RR_NUMBER'] = df['RR_NUMBER'].fillna(0).astype(int)
+df['CMDT_CODE'] = df['CMDT_CODE'].fillna(0).astype(int)
+df['INVOICE_NO.'] = df['INVOICE_NO.'].fillna(0).astype(int)
+df = df[df.RR_NUMBER !=0 ]
+print('Outward Freight Register Loaded')
 
-	frame4 = None
-	while not frame4:
-		try:
-			frame4 = browser.find_element_by_xpath('//iframe[@src="/foisweb/view/qry/TQ_OwcmViewRRSubOT.jsp"]')
-		except NoSuchElementException:
-			time.sleep(1)
 
-	browser.switch_to.frame(frame4)
-	yo = browser.find_element_by_xpath('//html/body/table/tbody/tr[6]/td[1]/table/tbody/tr[1]/td[2]/div/table/tbody/tr[1]/td[8]')
-	print(yo.text)
-	#browser.find_element_by_link_text('print').click()
+df2 = pd.read_table('/home/nawedx/Downloads/TrfcErngLdng.xls', skiprows=2)
+df2.columns = df2.columns.str.replace(' ', '_')
+print('Traffic Earning Loaded')
 
-	browser.switch_to.default_content()
-	frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
-	browser.switch_to.frame(frm)
-	frm = browser.find_element_by_xpath('//iframe[@name="frmDtls"]')
-	browser.switch_to.frame(frm)
-	back = browser.find_element_by_link_text('Back')
-	back.click()
+df3 = df.merge(df2, left_on=['RR_NUMBER', 'RR_DATE'], right_on=['RR_NUMB', 'RR_DATE'], how='left')
+print('MERGED')
+#print(df3.head())
 
+list1 = list(df3)
+list1 = list1[:5] + list1[-11:-6] + list1[-15:-13] + list1[6:-17]
+#print(list1)
+df3 = df3[list1]
+
+writer = ExcelWriter('merged_freight_register.xls')
+df3.to_excel(writer,'Sheet1')
+writer.save()
+
+browser.quit()
