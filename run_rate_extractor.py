@@ -91,7 +91,7 @@ while not showAll:
 		time.sleep(1)
 showAll.click()
 
-df3 = pd.read_excel('merged_freight_register.xls')
+df3 = pd.read_excel('MisOwtdFrgtRgtr.xls')
 rrList = df3['RR_NUMBER'].values
 listlen = len(rrList)
 df_RR_pol = pd.DataFrame(columns=['RR_Num', 'AT_RUN_RATE'])
