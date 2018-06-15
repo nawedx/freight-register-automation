@@ -7,7 +7,7 @@ import pandas as pd
 from pandas import ExcelWriter
 pd.set_option('display.max_columns', 100)
 
-df = pd.read_excel('/home/nawedx/Downloads/MisOwtdFrgtRgtr.xls', skiprows=2)
+df = pd.read_csv('C:\\Users\\AZ\\Downloads\\MisOwtdFrgtRgtr.csv', skiprows=2)
 df.columns = df.columns.str.replace(' ', '_')
 df['RR_NUMBER'] = df['RR_NUMBER'].fillna(0).astype(int)
 df['CMDT_CODE'] = df['CMDT_CODE'].fillna(0).astype(int)
@@ -19,7 +19,7 @@ rrList = df['RR_NUMBER'].values
 #print(rrList)
 listlen = len(rrList)
 
-df2 = pd.read_table('/home/nawedx/Downloads/TrfcErngLdng.xls', skiprows=2)
+df2 = pd.read_table('C:\\Users\\AZ\\Downloads\\TrfcErngLdng.xls', skiprows=2)
 df2.columns = df2.columns.str.replace(' ', '_')
 print('Traffic Earning Loaded')
 

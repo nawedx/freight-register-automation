@@ -10,15 +10,21 @@ import pandas as pd
 from pandas import ExcelWriter
 pd.set_option('display.max_columns', 100)
 
+#Firefox profile initialization
+profile = webdriver.FirefoxProfile()
+profile.set_preference("print_printer", 'Foxit Reader PDF Printer')
+profile.set_preference("print.always_print_silent", True)
+profile.set_preference("print.show_print_progress", True)
+
 #Initializes the webdriver and starts the browser
-browser = webdriver.Firefox()
+browser = webdriver.Firefox(profile)
 browser.get("https://www.fois.indianrail.gov.in/FoisWebsite/jsp/RMS_Zonal.jsp?txtProjName=TZ")
 #browser.maximize_window()
 
 #Switches to correct frame
-frame = None 
+frame = None
 while not frame:
-	try: 
+	try:
 		frame = browser.find_element_by_xpath('//frame[@name="frmApplLgin"]')
 	except NoSuchElementException:
 		time.sleep(1)
@@ -28,7 +34,7 @@ browser.switch_to.frame(frame)
 #I have made the assumption that if submit button is loaded all other fields before it has alse been loaded.
 login_attempt = None
 while not login_attempt:
-	try: 
+	try:
 		login_attempt = browser.find_element_by_id('Submit')
 	except NoSuchElementException:
 		time.sleep(1)
@@ -38,7 +44,7 @@ username = browser.find_element_by_name('txtUserId')
 password = browser.find_element_by_id('txtPassword')
 radiobut = None
 while not radiobut:
-	try: 
+	try:
 		radiobut = browser.find_element_by_id('txtOptnD')
 	except NoSuchElementException:
 		time.sleep(1)
