@@ -20,9 +20,9 @@ def writeToExcel(df, i, filename='processed_invoice_details'):
 
 def writeToTextfile(invoiceDates, rrGen, rrPending):
     with open('rakes_loaded.txt', 'r') as f:
-        x = f.readlines()
+        x = f.read().splitlines()
     with open("invoice_generated_datewise.txt", "w+") as text_file:
-        print("Sir, freight loading and RR issued on {}. Total Rake Loaded on Dt. {} is {}. RR issued on account of {} is {}. RR issued on account of {} is {}. RR issued on account of {} is {}. Pending RR on account of {} is {}. Pending RR on account of {} is {}. Pending RR on account of {} is {}. Regards".format(invoiceDates[2], invoiceDates[2], x[0], invoiceDates[2], rrGen[invoiceDates[2]], invoiceDates[1], rrGen[invoiceDates[1]], invoiceDates[0], rrGen[invoiceDates[0]], invoiceDates[2], rrPending[invoiceDates[2]], invoiceDates[1], rrPending[invoiceDates[1]], invoiceDates[0], rrPending[invoiceDates[0]]), file=text_file)
+        print("Sir, freight loading and RR issued on {}. \nTotal Rake Loaded on Dt. {} is {}. \nRR issued on account of {} is {}. \nRR issued on account of {} is {}. \nRR issued on account of {} is {}. \nPending RR on account of {} is {}. \nPending RR on account of {} is {}. \nPending RR on account of {} is {}. \nRegards.\n".format(invoiceDates[2], invoiceDates[2], x[0], invoiceDates[2], rrGen[invoiceDates[2]], invoiceDates[1], rrGen[invoiceDates[1]], invoiceDates[0], rrGen[invoiceDates[0]], invoiceDates[2], rrPending[invoiceDates[2]], invoiceDates[1], rrPending[invoiceDates[1]], invoiceDates[0], rrPending[invoiceDates[0]]), file=text_file)
 
 if __name__ == '__main__':
     filename = 'InvcDtls.xls'
