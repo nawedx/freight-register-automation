@@ -12,23 +12,11 @@ pd.set_option('display.max_columns', 100)
 
 #Firefox profile initialization
 profile = webdriver.FirefoxProfile()
-profile.set_preference("print_printer", 'Foxit Reader PDF Printer')
-profile.set_preference("print.always_print_silent", True)
-profile.set_preference("print.show_print_progress", True)
 
 #Initializes the webdriver and starts the browser
 browser = webdriver.Firefox(profile)
-browser.get("https://www.fois.indianrail.gov.in/FoisWebsite/jsp/RMS_Zonal.jsp?txtProjName=TZ")
+browser.get("http://fois.indianrail.gov.in/foisweb/view/GG_LoginMainPrtlTZ.jsp")
 #browser.maximize_window()
-
-#Switches to correct frame
-frame = None
-while not frame:
-	try:
-		frame = browser.find_element_by_xpath('//frame[@name="frmApplLgin"]')
-	except NoSuchElementException:
-		time.sleep(1)
-browser.switch_to.frame(frame)
 
 #Checks until the Submit button has been loaded
 #I have made the assumption that if submit button is loaded all other fields before it has alse been loaded.
@@ -65,10 +53,6 @@ time.sleep(3)
 login_attempt.submit()
 time.sleep(3)
 
-#Switches to the new window as the Submit open a new window
-newWindow = browser.window_handles[1]
-browser.switch_to.window(newWindow)
-
 #Waits for the page and the elements to load and goes to required page i.e "Freight Details"
 outward = None
 while not outward:
@@ -100,7 +84,7 @@ radioRRBut.click()
 
 #Waits until Date range is selected and a key is pressed in the program to continue
 print('Please select proper date range and press any key to continue : ')
-inp = raw_input()
+inp = input()
 
 submitButton = None
 while not submitButton:
@@ -128,5 +112,5 @@ excelDown.click()
 
 #To confirm that the Freight Register is downloaded
 print('Please check whether MisOwtdFrgtRgtr.xls is downloaded and press any key : ')
-inp = raw_input()
+inp = input()
 browser.quit()
