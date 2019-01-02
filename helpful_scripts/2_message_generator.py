@@ -27,7 +27,7 @@ def writeToTextfile(invoiceDates, rrGen, rrPending):
 if __name__ == '__main__':
     filename = 'InvcDtls.xls'
     df = readAndClean('/home/nawedx/Downloads/'+filename)
-    invoiceDates = sorted(df['INVOICE_DATE'].unique())
+    invoiceDates = (df['INVOICE_DATE'].unique())
     rrGen = {}
     rrPending = {}
     df['RR_NUMB'] = df['RR_NUMB'].fillna(0).astype(int)
@@ -44,8 +44,10 @@ if __name__ == '__main__':
     print('\nRR pending against dates : ')
     print(rrPending)
     writeToTextfile(invoiceDates, rrGen, rrPending)
+    '''
     if os.path.exists('/home/nawedx/Downloads/'+filename):
         os.rename('/home/nawedx/Downloads/'+filename, 'invcdtls_downloaded/InvcDtls_'+invoiceDates[0]+'---'+invoiceDates[2]+'.xls')
     else:
         print('File does not exist.\n')
+    '''
     

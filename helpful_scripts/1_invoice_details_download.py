@@ -67,6 +67,9 @@ browser.switch_to.frame(frame2)
 
 #Waits until Date range is selected and a key is pressed in the program to continue
 print('Please select proper date range and press any key to continue : ')
+
+
+
 inp = input()
 
 submitButton = None
@@ -152,6 +155,8 @@ while total != 'TOTAL':
 rakesLoaded = browser.find_element_by_xpath('/html/body/center/div[2]/table/tbody/tr['+str(i-1)+']/td[8]').text
 with open("rakes_loaded.txt", "w+") as text_file:
 	print("{}".format(rakesLoaded), file=text_file)
+
+print("Done")
 
 inp = input()
 
