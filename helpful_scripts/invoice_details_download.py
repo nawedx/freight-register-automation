@@ -5,13 +5,19 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 import time
-import os
+import os, sys
 import pandas as pd
 from pandas import ExcelWriter
+from datetime import date, timedelta
+fromdate = str((date.today()-timedelta(3)).day)
+todate = str((date.today()-timedelta(1)).day)
 pd.set_option('display.max_columns', 100)
 
+options = webdriver.FirefoxProfile();
+options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/vnd.ms-excel");
+
 #Initializes the webdriver and starts the browser
-browser = webdriver.Firefox()
+browser = webdriver.Firefox(options)
 browser.get("http://fois.indianrail.gov.in/rmsdqweb/view/GG_LoginMainPrtlRQ.jsp")
 #browser.maximize_window()
 
@@ -68,9 +74,51 @@ browser.switch_to.frame(frame2)
 #Waits until Date range is selected and a key is pressed in the program to continue
 print('Please select proper date range and press any key to continue : ')
 
+fromDateImage = None
+while not fromDateImage:
+	try:
+		print('FromDateImage')
+		fromDateImage = browser.find_element_by_xpath('/html/body/form[1]/table/tbody/tr[2]/td/fieldset/img[1]')
+	except NoSuchElementException:
+		time.sleep(1)
 
+fromDateImage.click()
 
-inp = input()
+fromDate = None
+while not fromDate:
+	try:
+		print('PreviousMonth')
+		fromDate = browser.find_element_by_xpath('//td[. = "<"]')
+	except NoSuchElementException:
+		time.sleep(1)
+fromDate.click()
+
+fromDate = None
+while not fromDate:
+	try:
+		print('FromDate')
+		fromDate = browser.find_element_by_xpath('//td[. = "'+fromdate+'"]')
+	except NoSuchElementException:
+		time.sleep(1)
+fromDate.click()
+
+toDateImage = None
+while not toDateImage:
+	try:
+		print('ToDateImage')
+		toDateImage = browser.find_element_by_xpath('/html/body/form[1]/table/tbody/tr[2]/td/fieldset/img[2]')
+	except NoSuchElementException:
+		time.sleep(1)
+toDateImage.click()
+
+toDate = None
+while not toDate:
+	try:
+		print('ToDate')
+		toDate = browser.find_element_by_xpath('//td[. = "'+todate+'"]')
+	except NoSuchElementException:
+		time.sleep(1)
+toDate.click()
 
 submitButton = None
 while not submitButton:
@@ -81,14 +129,6 @@ while not submitButton:
 submitButton.click()
 time.sleep(3)
 
-showAll = None
-while not showAll:
-	try:
-		showAll = browser.find_element_by_link_text('Show All')
-	except NoSuchElementException:
-		time.sleep(1)
-showAll.click()
-
 browser.switch_to.default_content()
 frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
 browser.switch_to.frame(frm)
@@ -98,7 +138,6 @@ excelDown.click()
 
 #To confirm that Invoice Details is downloaded
 print('Please check whether InvcDtls.xls is downloaded and press any key : ')
-inp = input()
 
 browser.switch_to.default_content()
 
@@ -121,6 +160,8 @@ while not frame2:
 	except NoSuchElementException:
 		time.sleep(1)
 browser.switch_to.frame(frame2)
+
+time.sleep(2)
 
 submitButton = None
 while not submitButton:
@@ -158,6 +199,8 @@ with open("rakes_loaded.txt", "w+") as text_file:
 
 print("Done")
 
-inp = input()
+import message_generator
 
 browser.quit()
+
+

@@ -1,7 +1,8 @@
-import os
+import os, time, sys
 import pandas as pd
 from pandas import ExcelWriter
 pd.set_option('display.max_columns', 10)
+#sys.stdout = open('runlog', 'w')
 
 def readAndClean(filename):
 	# Add skiprows if needed
@@ -25,6 +26,9 @@ def writeToTextfile(invoiceDates, rrGen, rrPending):
         print("Sir, freight loading and RR issued on {}. \nTotal Rake Loaded on Dt. {} is {}. \nRR issued on account of {} is {}. \nRR issued on account of {} is {}. \nRR issued on account of {} is {}. \nPending RR on account of {} is {}. \nPending RR on account of {} is {}. \nPending RR on account of {} is {}. \nRegards.\n".format(invoiceDates[2], invoiceDates[2], x[0], invoiceDates[2], rrGen[invoiceDates[2]], invoiceDates[1], rrGen[invoiceDates[1]], invoiceDates[0], rrGen[invoiceDates[0]], invoiceDates[2], rrPending[invoiceDates[2]], invoiceDates[1], rrPending[invoiceDates[1]], invoiceDates[0], rrPending[invoiceDates[0]]), file=text_file)
 
 if __name__ == '__main__':
+    import invoice_details_download
+
+    time.sleep(3)
     filename = 'InvcDtls.xls'
     df = readAndClean('/home/nawedx/Downloads/'+filename)
     invoiceDates = (df['INVOICE_DATE'].unique())
@@ -50,4 +54,7 @@ if __name__ == '__main__':
     else:
         print('File does not exist.\n')
     '''
+
+    import send_mail_position
+    send_mail_position.sendd()
     

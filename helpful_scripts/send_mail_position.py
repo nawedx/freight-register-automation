@@ -1,10 +1,13 @@
-import smtplib
+import smtplib, sys
 import credentials 
+from datetime import date, timedelta
 
 from string import Template
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+currDate = (str(date.today().day)+'-'+str(date.today().month)+'-'+str(date.today().year))
 
 def get_contacts(filename):
        
@@ -12,15 +15,18 @@ def get_contacts(filename):
     emails = []
     with open(filename, mode='r', encoding='utf-8') as contacts_file:
         for a_contact in contacts_file:
-            names.append(a_contact.split()[0])
-            emails.append(a_contact.split()[1])
+            conlist = a_contact.split(',')
+            print(conlist)
+            names.append(conlist[0])
+            emails.append(conlist[1])
             
     return names, emails
 
-def main():
-    names, emails = get_contacts('mycontacts.txt') # read contacts
+def sendd():
+    names, emails = get_contacts('mycontacts2.txt') # read contacts
     with open('invoice_generated_datewise.txt', 'r', encoding='utf-8') as template_file:
         message = template_file.read()
+        print(message)
     
 
     # set up the SMTP server
@@ -40,7 +46,7 @@ def main():
         # setup the parameters of the message
         msg['From']=credentials.MY_ADDRESS
         msg['To']=email
-        msg['Subject']="Goods Morning Position"
+        msg['Subject']="Goods Morning Position - " + currDate
         
         # add in the message body
         msg.attach(MIMEText(message, 'plain'))
@@ -52,5 +58,3 @@ def main():
     # Terminate the SMTP session and close the connection
     s.quit()
     
-if __name__ == '__main__':
-    main()
