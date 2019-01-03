@@ -21,12 +21,25 @@ def writeToExcel(df, i, filename='processed_invoice_details'):
 
 def writeToTextfile(invoiceDates, rrGen, rrPending):
     with open('rakes_loaded.txt', 'r') as f:
-        x = f.read().splitlines()
+        numberRakeLoaded = f.read().splitlines()
     with open("invoice_generated_datewise.txt", "w+") as text_file:
-        print("Sir, freight loading and RR issued on {}. \nTotal Rake Loaded on Dt. {} is {}. \nRR issued on account of {} is {}. \nRR issued on account of {} is {}. \nRR issued on account of {} is {}. \nPending RR on account of {} is {}. \nPending RR on account of {} is {}. \nPending RR on account of {} is {}. \nRegards.\n".format(invoiceDates[2], invoiceDates[2], x[0], invoiceDates[2], rrGen[invoiceDates[2]], invoiceDates[1], rrGen[invoiceDates[1]], invoiceDates[0], rrGen[invoiceDates[0]], invoiceDates[2], rrPending[invoiceDates[2]], invoiceDates[1], rrPending[invoiceDates[1]], invoiceDates[0], rrPending[invoiceDates[0]]), file=text_file)
+        print("Sir, freight loading and RR issued on {}.".format(invoiceDates[2]), file=text_file)
+        print("Total Rake Loaded on Dt. {} is {}.".format(invoiceDates[2], numberRakeLoaded[0]), file=text_file)
+        if rrGen[invoiceDates[2]] != 0:
+            print("RR issued on account of {} is {}.".format(invoiceDates[2], rrGen[invoiceDates[2]]), file=text_file)   
+        if rrGen[invoiceDates[1]] != 0:
+            print("RR issued on account of {} is {}.".format(invoiceDates[1], rrGen[invoiceDates[1]]), file=text_file) 
+        if rrGen[invoiceDates[0]] != 0:
+            print("RR issued on account of {} is {}.".format(invoiceDates[0], rrGen[invoiceDates[0]]), file=text_file) 
+        if rrPending[invoiceDates[2]] != 0:
+            print("Pending RR on account of {} is {}.".format(invoiceDates[2], rrPending[invoiceDates[2]]), file=text_file) 
+        if rrPending[invoiceDates[1]] != 0:
+            print("Pending RR on account of {} is {}.".format(invoiceDates[1], rrPending[invoiceDates[1]]), file=text_file) 
+        if rrPending[invoiceDates[0]] != 0:
+            print("Pending RR on account of {} is {}.".format(invoiceDates[0], rrPending[invoiceDates[0]]), file=text_file) 
 
 if __name__ == '__main__':
-    import invoice_details_download
+    #import invoice_details_download
 
     time.sleep(3)
     filename = 'InvcDtls.xls'
@@ -60,6 +73,6 @@ if __name__ == '__main__':
         print('File does not exist.\n')
     '''
 
-    import send_mail_position
-    send_mail_position.sendd()
+    #import send_mail_position
+    #send_mail_position.sendd()
     
