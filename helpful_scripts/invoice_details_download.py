@@ -4,18 +4,22 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 import os, time
 
 downloadPath = '/home/nawedx/Downloads/'
 
+currentDate = str(date.today().day)
 fromdate = str((date.today()-timedelta(3)).day)
 todate = str((date.today()-timedelta(1)).day)
 
 currentMonth = str(date.today().month)
 fromMonth = str((date.today()-timedelta(3)).month)
 toMonth = str((date.today()-timedelta(1)).month)
-print(currentMonth, fromMonth, toMonth, fromdate, todate)
+
+print('Current Date:', currentDate, '-', currentMonth)
+print('From Date:', fromdate, '-', fromMonth)
+print('To Date:', todate, '-', toMonth)
 
 options = webdriver.FirefoxProfile();
 options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/vnd.ms-excel");
@@ -114,10 +118,10 @@ ts = time.time()
 currentTimeStamp = datetime.fromtimestamp(ts).strftime('%d-%m-%Y--%H-%M-%S')
 
 filename = 'InvcDtls'
-newFileName = filename+str(currentTimeStamp)+'.xls'
-if os.path.exists(downloadPath+filename):
+newFileName = filename+str(currentTimeStamp)
+if os.path.exists(downloadPath+filename+'.xls'):
     os.rename(downloadPath+filename+'.xls', downloadPath+newFileName+'.xls')
-    print('Renamed existing file '+filename+'.xls as'+newFileName+'.xls')
+    print('Renamed existing file '+filename+'.xls as '+newFileName+'.xls')
 
 excelDown = browser.find_element_by_link_text('Excel')
 excelDown.click()
