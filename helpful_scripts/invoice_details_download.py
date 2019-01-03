@@ -4,17 +4,40 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
-import time
-import os, sys
-import pandas as pd
-from pandas import ExcelWriter
 from datetime import date, timedelta
+import os, time
+
 fromdate = str((date.today()-timedelta(3)).day)
 todate = str((date.today()-timedelta(1)).day)
-pd.set_option('display.max_columns', 100)
+
+currentMonth = str(date.today().month)
+fromMonth = str((date.today()-timedelta(3)).month)
+toMonth = str((date.today()-timedelta(1)).month)
+print(currentMonth, fromMonth, toMonth, fromdate, todate)
 
 options = webdriver.FirefoxProfile();
 options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/vnd.ms-excel");
+
+def getElementByXpath(xpth, ele):
+	browserElement = None
+	while not browserElement:
+		try:
+			print(ele)
+			browserElement = browser.find_element_by_xpath(xpth)
+			return browserElement
+		except NoSuchElementException:
+			time.sleep(1)
+
+def getElementByID(iD, ele):
+	browserElement = None
+	while not browserElement:
+		try:
+			print(ele)
+			browserElement = browser.find_element_by_id(iD)
+			return browserElement
+		except NoSuchElementException:
+			time.sleep(1)
+
 
 #Initializes the webdriver and starts the browser
 browser = webdriver.Firefox(options)
@@ -23,12 +46,7 @@ browser.get("http://fois.indianrail.gov.in/rmsdqweb/view/GG_LoginMainPrtlRQ.jsp"
 
 #Checks until the Submit button has been loaded
 #I have made the assumption that if submit button is loaded all other fields before it has alse been loaded.
-login_attempt = None
-while not login_attempt:
-	try:
-		login_attempt = browser.find_element_by_xpath('//*[@id="Submit"]')
-	except NoSuchElementException:
-		time.sleep(1)
+login_attempt = getElementByXpath('//*[@id="Submit"]', 'Login Submit Button')
 
 #Finds the required login details
 username = browser.find_element_by_xpath('//*[@id="txtUserId"]')
@@ -50,12 +68,7 @@ login_attempt.submit()
 time.sleep(3)
 
 #Waits for the page and the elements to load and goes to required page i.e "Invoice Details"
-invc = None
-while not invc:
-	try:
-		invc = browser.find_element_by_xpath('//td[. = "Operations Control"]')
-	except NoSuchElementException:
-		time.sleep(1)
+invc = getElementByXpath('//td[. = "Operations Control"]', 'Operations Control')
 invc.click()
 ftdetails = browser.find_element_by_xpath('//td[. = "Miscelleneous"]')
 ftdetails.click()
@@ -63,69 +76,30 @@ ftdetails = browser.find_element_by_xpath('//td[. = "Invoice Details"]')
 ftdetails.click()
 
 #Switches to appropriate frame.
-frame2 = None
-while not frame2:
-	try:
-		frame2 = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
-	except NoSuchElementException:
-		time.sleep(1)
+frame2 = getElementByXpath('//iframe[@name="frmInpt"]', 'Changing iframe to select dates')
 browser.switch_to.frame(frame2)
 
-#Waits until Date range is selected and a key is pressed in the program to continue
-print('Please select proper date range and press any key to continue : ')
-
-fromDateImage = None
-while not fromDateImage:
-	try:
-		print('FromDateImage')
-		fromDateImage = browser.find_element_by_xpath('/html/body/form[1]/table/tbody/tr[2]/td/fieldset/img[1]')
-	except NoSuchElementException:
-		time.sleep(1)
-
+fromDateImage = getElementByXpath('/html/body/form[1]/table/tbody/tr[2]/td/fieldset/img[1]', 'From Date Picker')
 fromDateImage.click()
 
-fromDate = None
-while not fromDate:
-	try:
-		print('PreviousMonth')
-		fromDate = browser.find_element_by_xpath('//td[. = "<"]')
-	except NoSuchElementException:
-		time.sleep(1)
+if fromMonth != currentMonth:
+	fromDate = getElementByXpath('//td[. = "<"]', 'Previous Month for from date')
+	fromDate.click()
+
+fromDate = getElementByXpath('//td[. = "'+fromdate+'"]', 'From Date')
 fromDate.click()
 
-fromDate = None
-while not fromDate:
-	try:
-		print('FromDate')
-		fromDate = browser.find_element_by_xpath('//td[. = "'+fromdate+'"]')
-	except NoSuchElementException:
-		time.sleep(1)
-fromDate.click()
-
-toDateImage = None
-while not toDateImage:
-	try:
-		print('ToDateImage')
-		toDateImage = browser.find_element_by_xpath('/html/body/form[1]/table/tbody/tr[2]/td/fieldset/img[2]')
-	except NoSuchElementException:
-		time.sleep(1)
+toDateImage = getElementByXpath('/html/body/form[1]/table/tbody/tr[2]/td/fieldset/img[2]', 'To Date Picker')
 toDateImage.click()
 
-toDate = None
-while not toDate:
-	try:
-		print('ToDate')
-		toDate = browser.find_element_by_xpath('//td[. = "'+todate+'"]')
-	except NoSuchElementException:
-		time.sleep(1)
+if toMonth != currentMonth:
+	toDate = getElementByXpath('//td[. = "<"]', 'Previous Month for to date')
+	toDate.click()
+
+toDate = getElementByXpath('//td[. = "'+todate+'"]', 'To Date')
 toDate.click()
 
-submitButton = None
-while not submitButton:
-	try:
-		submitButton = browser.find_element_by_id('Submit')
-	except NoSuchElementException:
-		time.sleep(1)
+submitButton = getElementByID('Submit', 'Submit on invoice details date page')
 submitButton.click()
 time.sleep(3)
 
@@ -133,42 +107,27 @@ browser.switch_to.default_content()
 frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
 browser.switch_to.frame(frm)
 time.sleep(1)
+
 excelDown = browser.find_element_by_link_text('Excel')
 excelDown.click()
 
 #To confirm that Invoice Details is downloaded
-print('Please check whether InvcDtls.xls is downloaded and press any key : ')
+#print('Please check whether InvcDtls.xls is downloaded and press any key : ')
 
 browser.switch_to.default_content()
 
-invc = None
-while not invc:
-	try:
-		invc = browser.find_element_by_xpath('//td[. = "Managerial Set"]')
-	except NoSuchElementException:
-		time.sleep(1)
+invc = getElementByXpath('//td[. = "Managerial Set"]', 'Managerial Set')
 invc.click()
 ftdetails = browser.find_element_by_xpath('//td[. = "Demand"]')
 ftdetails.click()
 ftdetails = browser.find_element_by_xpath('//td[. = "Area wise Loading/Unloading (Details)"]')
 ftdetails.click()
 
-frame2 = None
-while not frame2:
-	try:
-		frame2 = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
-	except NoSuchElementException:
-		time.sleep(1)
+frame2 = getElementByXpath('//iframe[@name="frmInpt"]', 'Frame switch in area wise loading')
 browser.switch_to.frame(frame2)
-
 time.sleep(2)
 
-submitButton = None
-while not submitButton:
-	try:
-		submitButton = browser.find_element_by_id('Submit')
-	except NoSuchElementException:
-		time.sleep(1)
+submitButton = getElementByID('Submit', 'Submit on area wise loading date page')
 submitButton.click()
 time.sleep(3)
 
@@ -180,13 +139,7 @@ while not showAll:
 		time.sleep(1)
 showAll.click()
 
-
-total = None
-while not total:
-	try:
-		total = browser.find_element_by_xpath('/html/body/center/div[2]/table/tbody/tr[1]/td[1]').text
-	except NoSuchElementException:
-		time.sleep(1)
+total = getElementByXpath('/html/body/center/div[2]/table/tbody/tr[1]/td[1]', 'Getting total as text').text
 
 i=1
 while total != 'TOTAL':
@@ -194,13 +147,10 @@ while total != 'TOTAL':
 	i = i + 1
 
 rakesLoaded = browser.find_element_by_xpath('/html/body/center/div[2]/table/tbody/tr['+str(i-1)+']/td[8]').text
+print('Rakes Loaded : ', rakesLoaded)
 with open("rakes_loaded.txt", "w+") as text_file:
 	print("{}".format(rakesLoaded), file=text_file)
 
-print("Done")
-
-import message_generator
+print("Invoice Details downloaded and rakes loaded extracted")
 
 browser.quit()
-
-
