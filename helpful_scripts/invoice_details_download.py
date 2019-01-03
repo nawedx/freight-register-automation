@@ -7,6 +7,8 @@ from selenium.common.exceptions import NoSuchElementException
 from datetime import date, timedelta
 import os, time
 
+downloadPath = '/home/nawedx/Downloads/'
+
 fromdate = str((date.today()-timedelta(3)).day)
 todate = str((date.today()-timedelta(1)).day)
 
@@ -108,8 +110,20 @@ frm = browser.find_element_by_xpath('//iframe[@name="frmInpt"]')
 browser.switch_to.frame(frm)
 time.sleep(1)
 
+ts = time.time()
+currentTimeStamp = datetime.fromtimestamp(ts).strftime('%d-%m-%Y--%H-%M-%S')
+
+filename = 'InvcDtls'
+newFileName = filename+str(currentTimeStamp)+'.xls'
+if os.path.exists(downloadPath+filename):
+    os.rename(downloadPath+filename+'.xls', downloadPath+newFileName+'.xls')
+    print('Renamed existing file '+filename+'.xls as'+newFileName+'.xls')
+
 excelDown = browser.find_element_by_link_text('Excel')
 excelDown.click()
+time.sleep(5)
+if os.path.exists('/home/nawedx/Downloads/'+filename+'.xls'):
+	print('Invoice details downloaded successfully')
 
 #To confirm that Invoice Details is downloaded
 #print('Please check whether InvcDtls.xls is downloaded and press any key : ')
