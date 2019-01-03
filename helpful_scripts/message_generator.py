@@ -1,4 +1,4 @@
-import os, time, sys
+import os, time, sys, datetime
 import pandas as pd
 from pandas import ExcelWriter
 pd.set_option('display.max_columns', 10)
@@ -31,7 +31,12 @@ if __name__ == '__main__':
     time.sleep(3)
     filename = 'InvcDtls.xls'
     df = readAndClean('/home/nawedx/Downloads/'+filename)
-    invoiceDates = (df['INVOICE_DATE'].unique())
+    invoiceDates = sorted(df['INVOICE_DATE'].unique())
+    dates = [datetime.datetime.strptime(ts, "%d-%m-%y") for ts in invoiceDates]
+    dates.sort()
+    invoiceDates = [datetime.datetime.strftime(ts, "%d-%m-%y") for ts in dates]
+    print(invoiceDates)
+    
     rrGen = {}
     rrPending = {}
     df['RR_NUMB'] = df['RR_NUMB'].fillna(0).astype(int)
