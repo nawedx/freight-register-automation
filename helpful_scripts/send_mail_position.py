@@ -17,11 +17,15 @@ def getContacts(filename):
             #print(conlist)
             names.append(conlist[0])
             emails.append(conlist[1])
+            names.append(conlist[2])
+            emails.append(conlist[3])
+            names.append(conlist[4])
+            emails.append(conlist[5])
             
     return names, emails
 
 def sendMail():
-    names, emails = getContacts('mycontacts2.txt') # read contacts
+    names, emails = getContacts('mycontacts.txt') # read contacts
     with open('invoice_generated_datewise.txt', 'r', encoding='utf-8') as template_file:
         message = template_file.read()
         print(message)

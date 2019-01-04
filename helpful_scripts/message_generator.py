@@ -26,14 +26,14 @@ def writeToTextfile(invoiceDates, rrGen, rrPending):
 
     with open("invoice_generated_datewise.txt", "w+") as text_file:
         print("Sir, freight loading and RR issued on {}.".format(invoiceDates[2]), file=text_file)
-        print("Total Rake Loaded on Dt. {} is {}.".format(invoiceDates[2], numberRakeLoaded[0]), file=text_file)
+        print("Total Rakes Loaded on Dt. {} is {}.".format(invoiceDates[2], numberRakeLoaded[0]), file=text_file)
         for n in reversed(range(0, 3)):
             if rrGen[invoiceDates[n]] != 0:
                 print("RR issued on account of {} is {}.".format(invoiceDates[n], rrGen[invoiceDates[n]]), file=text_file)   
         for n in reversed(range(0, 3)):
             if rrPending[invoiceDates[n]] != 0:
                 print("Pending RR on account of {} is {}.".format(invoiceDates[n], rrPending[invoiceDates[n]]), file=text_file)   
-
+        print("Regards.", file=text_file)
     print('\nMessage generated and written to text file.\n')
 
         
